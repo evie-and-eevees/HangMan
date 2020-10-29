@@ -1,11 +1,7 @@
 import random
-E = [['a','b','l','e'], ['c','a','r','p','e','n','t','e','r'], ['d','a','m','a','g','e'], ['f','o','r','e','v','e','r'],
-        ['h','e','l','m','e','t'], ['m','o','u','n','t','a','i','n'], ['r','e','c','o','r','d'], ['t','o','t','a','l']]
-M = [['a', 'c', 't', 'i', 'v', 'i', 't', 'y'], ['c','a','l','e','n','d','a','r'], ['c','u','r','r','e','n','c','y'],
-        ['f','a','m','o','u','s'], ['i','n','d','u','s','t','r','y'], ['m','e','n','t','i','o','n'], ['p','i','c','t','u','r','e'],
-        ['r','e','d','u','c','e'], ['t','e','l','e','v','i','s','e'], ['w','r','i','s','t']]
-H= [['a','c','h','i','e','v','e'], ['c','a','l','c','u','l','a','t','o','r'], ['e','x','a','s','p','e','r','a','t','i','n','g'],
-        ['l','e','a','t','h','e','r'], ['p','r','o','p','e','l'], ['t','e','r','r','i','t','o','r','y']]
+E = ('able', 'carpenter', 'damage', 'forever', 'helmet', 'mountain', 'record', 'total')
+M = ('activity', 'calendar', 'currency', 'famous', 'industry', 'mention', 'picture', 'reduce', 'televise', 'wrist')
+H= ['achieve', 'calculator', 'exasperating', 'leather', 'propel', 'territory']
 alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
 bank = input('Welcome to Hangman! Please enter [E]asy, [M]edium, or [H]ard for difficulty: ')
 difficulties = ['E','M','H']
@@ -18,7 +14,9 @@ if bank == 'H':
     bank = H
 if bank == 'M':
     bank = M
-word = bank[random.randrange(0, len(bank), 1)]
+word = bank[random.randint(0,len(bank))]
+word = "".join(word)
+word = list(word)
 length = len(word)
 answers = []
 guesses = []
