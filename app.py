@@ -5,7 +5,7 @@ M = ('activity', 'calendar', 'currency', 'famous', 'industry', 'mention', 'pictu
 H= ['achieve', 'calculator', 'exasperating', 'leather', 'propel', 'territory']
 
 app = Flask(__name__)
-app.config["SECREt_KEY"] = "akljsghakljsehakljslaksjhdfalksedf"
+app.config["SECRET_KEY"] = "akljsghakljsehakljslaksjhdfalksedf"
 
 @app.route("/", methods=["POST", "GET"])
 def hangMan():
