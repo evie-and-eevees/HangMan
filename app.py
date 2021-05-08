@@ -9,6 +9,7 @@ app.config["SECREt_KEY"] = "akljsghakljsehakljslaksjhdfalksedf"
 
 @app.route("/", methods=["POST", "GET"])
 def hangMan():
+    finnish = ''
     if "guesses" not in session:
         session["guesses"] = []
     if request.method == "GET":
@@ -48,8 +49,14 @@ def hangMan():
         session["r"] = 5
     if "output" not in session:
         session['output'] = ''
+    if request.form['action'] == "Keep Going":
+        session['r'] = -1
+    if request.form['action'] == "Stop":
+        session['r'] = -2
+        finish = 'n'
     errors = ''
-    if request.form["action"] == "Submit Letter":
+    message = ''
+    if request.form["action"] == "Submit Letter" and session['r'] != 0:
         if len(request.form["letter"]) != 1 and request.form["letter"] != session["word"]:
             errors += "Please only enter 1 letter at a time\n"
         if not request.form['letter'].isalpha():
@@ -62,26 +69,35 @@ def hangMan():
                 for x in session['word']:
                     index = session['word'].index(x)
                     session['answers'][index] = request.form['letter']
-                if '_' not in session['answers']:
+                if ('_' not in session['answers'] or request.form['letter'] == session['word']) and session['r'] > 0:
                     return '''
                         <html>
                             <body>
                                 <p>Letters guessed: {letters}</p>
                                 <p>Word: {answers}</p>
-                                <p>'''
-                print(f"{' '.join(session['answers'])} Good job!")
+                                <p>You win! Play again?</p>
+                                <form method="get" action="/">
+                                    <button type="submit">Click here to play again!</button>
+                                </form>
+                            </body>
+                        </html>
+                    '''
+                if '_' not in session['answers'] or request.form['letter'] == session['word']:
+                    finish = 'n'
+                message += "Good Guess!\n"
             elif request.form['letter'] not in session['word']:
                 session['r'] = session['r'] - 1
                 if session['r'] > 0:
-                    session['r'] = 0
-                print(f"{' '.join(session['answers'])} Good try.")
-    while session['r'] != 0:
+                    session['r'] = -1
+                message += "Good try\n"
+    if session['r'] != 0:
         return '''
             <html>
                 <body>
                     <p>{errors}</p}
                     <p>Word: {answers}</p>
                     <p>Letters guessed: {guesses}</p>
+                    <p>{message}</p>
                     <p>Attempt(s) remaining: {r}</p>
                     <p>Enter a letter:</p>
                     <form method="post" action=".">
@@ -90,4 +106,36 @@ def hangMan():
                     </form>
                 </body>
             </html>
-        '''.format(errors=errors, answers=' '.join(session['answers']), guesses=session['guesses'], r=session['r'])
+        '''.format(errors=errors, answers=' '.join(session['answers']), guesses=session['guesses'], r=session['r'], message=message)
+    if session['r'] == 0:
+        return '''
+            <html>
+                <body>
+                    <p>{errors}</p}
+                    <p>Word: {answers}</p>
+                    <p>Letters guessed: {guesses}</p>
+                    <p>{message}</p>
+                    <p>Attempt(s) remaining: {r}</p>
+                    <p>You lost! Would you like to keep playing?</p>
+                    <form method="post" action=".">
+                        <p><input type="submit" id="Keep Going" name="action" value="Keep Going" /></p>
+                        <p><input type="submit" id="Stop" name="action" value="Stop" /></p>
+                    </form>
+                </body>
+            </html>
+        '''.format(errors=errors, answers=' '.join(session['answers']), guesses=session['guesses'], r=session['r'], message=message)
+    if finish == 'n':
+        return '''
+            <html>
+                <body>
+                    <p>{errors}</p}
+                    <p>Word: {answers}</p>
+                    <p>Letters guessed: {guesses}</p>
+                    <p>{message}</p>
+                    <p>Game over</p>
+                    <form method="get" action="/">
+                        <button type="submit">Click here to play again!</button>
+                    </form>
+                </body>
+            </html>
+        '''
