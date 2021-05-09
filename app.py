@@ -6,6 +6,7 @@ H = ['achieve', 'calculator', 'exasperating', 'leather', 'propel', 'territory']
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "akljsghakljsehakljslaksjhdfalksedf"
+app.config['DEBUG'] = True
 
 @app.route("/", methods=["POST", "GET"])
 def hangMan():
@@ -58,22 +59,22 @@ def hangMan():
         finish = 'n'
     errors = ''
     if "letter" in request.form and session['r'] != 0:
-        if len(request.form["letter"]) != 1 and request.form["letter"] != session["word"]:
+        if len(request.form["letter"]) != 1 and request.form["letter"].lower() != session["word"]:
             errors += "<p>Please only enter 1 letter at a time</p>"
         elif not request.form['letter'].isalpha():
             errors += "<p>Please enter letters only</p>"
         elif request.form['letter'] in session["guesses"]:
             errors += "<p>You have already guessed {!r}</p>".format(request.form["letter"])
         else:
-            request.form['letter'] = request.form['letter'].lower()
-            session["guesses"].append(request.form['letter'])
-            if request.form['letter'] in session['word']:
+            letter = str(request.form['letter']).lower()
+            session["guesses"].append(letter)
+            if letter in session['word']:
                 i = 0
                 for x in session['word']:
-                    if x == request.form['letter']:
-                        session['answers'][i] = request.form['letter']
+                    if x == letter:
+                        session['answers'][i] = letter
                     i += 1
-                if ('_' not in session['answers'] or request.form['letter'] == session['word']) and session['r'] > 0:
+                if ('_' not in session['answers'] or letter == session['word']) and session['r'] > 0:
                     return '''
                         <html>
                             <body>
@@ -86,15 +87,15 @@ def hangMan():
                             </body>
                         </html>
                     '''.format(letters=session['guesses'], answers=(''.join(session['answers'])))
-                if session['r'] < 0 and ('_' not in session['answers'] or request.form['letter'] == session['word']):
+                if session['r'] < 0 and ('_' not in session['answers'] or letter == session['word']):
                     finish = 'n'
                 message += "Good Guess!\n"
-            elif request.form['letter'] not in session['word']:
+            elif letter not in session['word']:
                 session['r'] = session['r'] - 1
                 if session['r'] < 0:
                     session['r'] = -1
                 message += "Good try\n"
-    if session['r'] != 0:
+    if session['r'] != 0 and finish != 'n':
         session['answers'] = session['answers']
         return '''
             <html>
@@ -143,4 +144,4 @@ def hangMan():
                     </form>
                 </body>
             </html>
-        '''
+        '''.format(errors=errors, answers=' '.join(session['answers']), guesses=session['guesses'], message=message)
