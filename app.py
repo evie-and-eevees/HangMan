@@ -65,6 +65,7 @@ def hangMan():
         elif request.form['letter'] in session["guesses"]:
             errors += "<p>You have already guessed {!r}</p>".format(request.form["letter"])
         else:
+            request.form['letter'] = request.form['letter'].lower()
             session["guesses"].append(request.form['letter'])
             if request.form['letter'] in session['word']:
                 i = 0
